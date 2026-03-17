@@ -13,10 +13,6 @@ Live at **[docs.switchman.dev](https://docs.switchman.dev)**
 - [Command reference](https://docs.switchman.dev/command-reference/) — every CLI command
 - [Pro & login guide](https://docs.switchman.dev/pro/) — subscribe, activate, team invites
 
-## Stack
-
-Static HTML — no build step, no dependencies. Deployed to Cloudflare Pages.
-
 ## Contributing
 
 Found something wrong or missing? Open an issue or PR on the [main Switchman repo](https://github.com/switchman-dev/switchman).
