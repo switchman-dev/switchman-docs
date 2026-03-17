@@ -19,4 +19,4 @@ Found something wrong or missing? Open an issue or PR on the [main Switchman rep
 
 ## License
 
-MIT — [Recio Ltd](https://switchman.dev)
+MIT 
