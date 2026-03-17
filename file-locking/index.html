@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How File Locking Works — Switchman Docs</title>
+  <meta name="description" content="Understand how Switchman's file locking, leases, and claims prevent conflicts between parallel AI coding agents.">
+  <link rel="canonical" href="https://docs.switchman.dev/file-locking/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+  </nav>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/">Getting started</a></li>
+        <li><a href="/claude-code/">Claude Code setup</a></li>
+        <li><a href="/cursor/">Cursor setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/" class="active">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>How file locking works</span>
+    </div>
+
+    <h1>How file locking works</h1>
+    <p class="doc-lead">Switchman prevents file conflicts using a three-layer model: tasks, leases, and claims. Understanding this model helps you get the most out of parallel agent coordination.</p>
+
+    <h2>The problem it solves</h2>
+    <p>When two AI agents edit the same file simultaneously, you get a merge conflict. In the best case it's annoying to resolve. In the worst case — when both agents have made significant changes to the same file — one agent's work gets thrown away entirely.</p>
+    <p>Traditional tools detect conflicts at merge time. Switchman prevents them at claim time — before a single conflicting line is written.</p>
+
+    <h2>Three layers of coordination</h2>
+
+    <h3>Tasks</h3>
+    <p>A task is a unit of work. Tasks live in a shared queue and have a title, priority, and status. Agents pick tasks up one at a time via <code>switchman_task_next</code>. The dequeue operation is atomic — no two agents can get the same task simultaneously.</p>
+    <pre><code>switchman task add "Add auth middleware" --priority 9
+switchman task add "Write auth tests" --priority 7
+switchman task list</code></pre>
+
+    <h3>Leases</h3>
+    <p>When an agent picks up a task, it gets a <strong>lease</strong> — a time-bounded ownership token. The lease has a heartbeat that the agent must refresh every 60 seconds. If the heartbeat stops, the lease expires, the task is released, and another agent can pick it up.</p>
+    <p>This prevents work from getting stuck forever if an agent crashes or the user closes their editor mid-task.</p>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">The Switchman MCP server handles heartbeats automatically. If you're using the CLI directly, call <code>switchman lease heartbeat &lt;lease-id&gt;</code> periodically.</div>
+    </div>
+
+    <h3>Claims</h3>
+    <p>Within a lease, an agent registers <strong>claims</strong> on the specific files it will edit. A claim says "I own this file for the duration of my lease." Any other agent that tries to claim the same file gets blocked immediately.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ</span>
+      <div class="callout-body"><strong>This is structural, not advisory.</strong> File claims are enforced at the database level using a partial unique index on active claims. Two concurrent claim attempts resolve with exactly one winner — guaranteed, even under concurrent load.</div>
+    </div>
+
+    <h2>The claim lifecycle</h2>
+    <ol>
+      <li>Agent calls <code>switchman_task_next</code> → receives task + lease ID</li>
+      <li>Agent calls <code>switchman_task_claim</code> with file paths → claims are registered</li>
+      <li>Agent edits the claimed files</li>
+      <li>Agent calls <code>switchman_task_done</code> → lease closes, claims released</li>
+      <li>Files are now available for other agents to claim</li>
+    </ol>
+
+    <h2>What happens when a claim is blocked</h2>
+    <p>If agent2 tries to claim <code>src/auth.js</code> while agent1 owns it, the claim is rejected. The agent receives a clear error:</p>
+    <pre><code>{
+  "ok": false,
+  "reason": "file_already_claimed",
+  "claimed_by": "agent1",
+  "task_id": "task-auth-001"
+}</code></pre>
+    <p>The agent should then either:</p>
+    <ul>
+      <li>Pick different files to edit that don't conflict</li>
+      <li>Call <code>switchman_task_next</code> to get a different task entirely</li>
+      <li>Wait for agent1 to finish and the claim to be released</li>
+    </ul>
+
+    <h2>Stale lease recovery</h2>
+    <p>If an agent crashes or stops sending heartbeats, its lease is marked stale after the timeout (default: 15 minutes). Switchman then:</p>
+    <ol>
+      <li>Expires the lease</li>
+      <li>Releases all file claims held by that lease</li>
+      <li>Requeues the task so another agent can pick it up</li>
+    </ol>
+    <p>This happens automatically. You can trigger it manually:</p>
+    <pre><code>switchman lease reap     # reap all stale leases
+switchman status         # shows any stale work detected</code></pre>
+
+    <h2>The enforcement gateway</h2>
+    <p>For the strongest conflict prevention, agents should write files through the Switchman gateway instead of directly:</p>
+    <pre><code># MCP tool — validates claim before writing
+switchman_write_file
+
+# CLI equivalent
+switchman write &lt;path&gt; &lt;content&gt;</code></pre>
+    <p>The gateway checks that the agent has an active claim on the file before allowing the write. Direct file system writes are not blocked — but they are detected by the background monitor:</p>
+    <pre><code>switchman monitor status    # check for rogue edits</code></pre>
+
+    <h2>Concurrency model</h2>
+    <p>Switchman uses SQLite with WAL mode and <code>BEGIN IMMEDIATE</code> transactions. The file claims table has a partial unique index on <code>(file_path, status='active')</code>. This means:</p>
+    <ul>
+      <li>Two agents claiming the same file simultaneously → exactly one wins, one gets rejected</li>
+      <li>Claim operations complete in under 5ms</li>
+      <li>No deadlocks — SQLite's busy timeout handles contention gracefully</li>
+    </ul>
+
+    <nav class="page-nav">
+      <a href="/cursor/" class="page-nav-card">
+        <div class="page-nav-label">← Previous</div>
+        <div class="page-nav-title">Cursor setup</div>
+      </a>
+      <a href="/command-reference/" class="page-nav-card next">
+        <div class="page-nav-label">Next →</div>
+        <div class="page-nav-title">Command reference</div>
+      </a>
+    </nav>
+  </main>
+
+</div>
+</body>
+</html>

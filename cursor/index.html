@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cursor Setup — Switchman Docs</title>
+  <meta name="description" content="Set up Switchman with Cursor. Configure MCP and run multiple Cursor agents on one codebase without conflicts.">
+  <link rel="canonical" href="https://docs.switchman.dev/cursor/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+  </nav>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/">Getting started</a></li>
+        <li><a href="/claude-code/">Claude Code setup</a></li>
+        <li><a href="/cursor/" class="active">Cursor setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Cursor setup</span>
+    </div>
+
+    <h1>Cursor setup</h1>
+    <p class="doc-lead">Switchman works natively with Cursor via MCP. Set up once and Cursor agents coordinate automatically across all your workspaces.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ</span>
+      <div class="callout-body"><strong>Prerequisites:</strong> Complete <a href="/getting-started/">Getting started</a> first. You need Switchman installed and <code>switchman setup --agents N</code> run in your repo.</div>
+    </div>
+
+    <h2>How Cursor MCP works</h2>
+    <p>Switchman setup automatically creates a <code>.cursor/mcp.json</code> file in your repo root and in each agent workspace. Cursor reads this file and makes the Switchman MCP tools available in the agent sidebar.</p>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">Unlike some MCP integrations, Switchman's Cursor config requires <strong>no API keys or manual configuration</strong>. The <code>.cursor/mcp.json</code> file is self-contained.</div>
+    </div>
+
+    <h2>Step 1 — Run setup</h2>
+    <pre><code>cd my-project
+switchman setup --agents 3</code></pre>
+
+    <p>This creates <code>.cursor/mcp.json</code> in both the main repo and each agent workspace.</p>
+
+    <h2>Step 2 — Verify MCP config</h2>
+    <pre><code>cat .cursor/mcp.json</code></pre>
+
+    <p>You should see a config pointing to the <code>switchman-mcp</code> binary. If the file is missing, run <code>switchman setup</code> again.</p>
+
+    <h2>Step 3 — Open workspaces in Cursor</h2>
+    <p>Open each agent workspace as a separate Cursor window:</p>
+    <pre><code>cursor ../my-project-agent1
+cursor ../my-project-agent2
+cursor ../my-project-agent3</code></pre>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body"><strong>Each workspace must be opened as its own Cursor project</strong> — not as a subfolder. Each workspace has its own <code>.cursor/mcp.json</code> connecting to the shared coordination database in the main repo.</div>
+    </div>
+
+    <h2>Step 4 — Enable MCP in Cursor settings</h2>
+    <p>In each Cursor window:</p>
+    <ol>
+      <li>Open <strong>Settings</strong> → <strong>Features</strong> → <strong>MCP</strong></li>
+      <li>Confirm Switchman appears in the MCP servers list</li>
+      <li>Toggle it on if it's not already enabled</li>
+    </ol>
+
+    <p>You should see these tools available in the Cursor agent panel:</p>
+    <ul>
+      <li><code>switchman_task_next</code></li>
+      <li><code>switchman_task_claim</code></li>
+      <li><code>switchman_task_done</code></li>
+      <li><code>switchman_write_file</code></li>
+      <li><code>switchman_status</code></li>
+    </ul>
+
+    <h2>Step 5 — Add tasks and start agents</h2>
+    <pre><code>switchman task add "Implement payment webhook" --priority 9
+switchman task add "Add webhook tests" --priority 7</code></pre>
+
+    <p>Tell each Cursor agent to start working. A good prompt to start an agent session:</p>
+    <pre><span class="pre-label">cursor agent prompt</span><code>Use the switchman_task_next tool to get your next task.
+Claim the files you need with switchman_task_claim before editing them.
+When done, call switchman_task_done.
+Check CLAUDE.md for coordination instructions.</code></pre>
+
+    <h2>Step 6 — Watch the dashboard</h2>
+    <pre><code>switchman status --watch</code></pre>
+
+    <p>This shows all agents, their active tasks, file claims, and any blocked collision attempts in real time.</p>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>MCP tools not showing in Cursor</h3>
+    <p>Check the config file exists:</p>
+    <pre><code>ls .cursor/mcp.json</code></pre>
+    <p>If missing, re-run <code>switchman setup --agents 3</code>. Also check Cursor's MCP settings — some versions require restarting Cursor after a new MCP server is added.</p>
+
+    <h3>Agent gets "task already claimed"</h3>
+    <p>Another agent claimed that task. The agent should call <code>switchman_task_next</code> again to get a different task. Tasks are dequeued atomically — no two agents can get the same task.</p>
+
+    <h3>Cursor agent isn't using Switchman tools</h3>
+    <p>Include explicit instructions in your prompt. Cursor agents don't always use MCP tools unless asked. Use the prompt template above or add coordination instructions to a <code>CLAUDE.md</code> file (Cursor reads it too).</p>
+
+    <nav class="page-nav">
+      <a href="/claude-code/" class="page-nav-card">
+        <div class="page-nav-label">← Previous</div>
+        <div class="page-nav-title">Claude Code setup</div>
+      </a>
+      <a href="/file-locking/" class="page-nav-card next">
+        <div class="page-nav-label">Next →</div>
+        <div class="page-nav-title">How file locking works</div>
+      </a>
+    </nav>
+  </main>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Switchman Docs — The Operating System for Parallel AI Development</title>
+  <meta name="description" content="Documentation for Switchman — install, set up Claude Code or Cursor, understand file locking, and use Switchman Pro.">
+  <link rel="canonical" href="https://docs.switchman.dev/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="docs.css">
+  <style>
+    .docs-home { max-width: 860px; margin: 0 auto; padding: 64px 36px 96px; }
+    .home-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: block; }
+    .home-title { font-size: clamp(28px, 4vw, 48px); font-weight: 600; letter-spacing: -0.03em; color: var(--text); line-height: 1.1; margin-bottom: 16px; }
+    .home-title em { font-style: normal; color: var(--accent); }
+    .home-sub { font-size: 17px; color: var(--text-2); line-height: 1.7; max-width: 560px; margin-bottom: 48px; }
+    .quick-install { display: flex; align-items: center; gap: 12px; margin-bottom: 64px; flex-wrap: wrap; }
+    .install-pill { background: var(--bg-card); border: 1px solid var(--border); border-radius: 99px; padding: 10px 22px; font-family: var(--mono); font-size: 13px; color: var(--accent); cursor: pointer; transition: border-color 0.15s; user-select: none; display: flex; align-items: center; gap: 12px; }
+    .install-pill:hover { border-color: var(--accent-border); }
+    .install-pill.copied { border-color: var(--green); color: var(--green); }
+    .copy-hint { font-size: 10px; color: var(--text-3); opacity: 0; transition: opacity 0.15s; }
+    .install-pill:hover .copy-hint { opacity: 1; }
+    .install-sub { font-size: 13px; color: var(--text-3); font-family: var(--mono); }
+    .doc-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 48px; }
+    .doc-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 28px 28px; text-decoration: none; transition: border-color 0.15s, background 0.15s; display: block; }
+    .doc-card:hover { border-color: var(--accent-border); background: var(--bg-raised); }
+    .doc-card-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); opacity: 0.8; margin-bottom: 10px; display: block; }
+    .doc-card h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.01em; }
+    .doc-card p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+    .doc-card-arrow { color: var(--accent); margin-top: 16px; font-size: 14px; display: block; font-family: var(--mono); }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+    .quick-links-title { font-size: 13px; font-family: var(--mono); color: var(--text-3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 16px; }
+    .quick-links { display: flex; flex-direction: column; gap: 8px; }
+    .quick-link { display: flex; align-items: center; gap: 10px; color: var(--text-2); text-decoration: none; font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+    .quick-link:last-child { border-bottom: none; }
+    .quick-link:hover { color: var(--accent); }
+    .quick-link-arrow { color: var(--text-3); margin-left: auto; }
+    @media (max-width: 600px) { .doc-cards { grid-template-columns: 1fr; } .docs-home { padding: 40px 20px 64px; } }
+  </style>
+</head>
+<body>
+
+<!-- Simple nav for homepage - no sidebar needed -->
+<nav class="top-nav" style="grid-column: 1/-1;">
+  <a href="https://switchman.dev" class="nav-logo">
+    <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+    switchman
+    <span class="nav-logo-badge">docs</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="https://switchman.dev">Home</a></li>
+    <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+    <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+    <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+  </ul>
+</nav>
+
+<div class="docs-home">
+  <span class="home-kicker">Documentation</span>
+  <h1 class="home-title">The operating system<br>for <em>parallel AI development.</em></h1>
+  <p class="home-sub">Everything you need to coordinate multiple AI coding agents on one codebase — from first install to team coordination at scale.</p>
+
+  <div class="quick-install">
+    <div class="install-pill" onclick="copyCmd(this)" role="button">
+      <span>$ npm install -g switchman-dev</span>
+      <span class="copy-hint">copy</span>
+    </div>
+    <span class="install-sub">then: switchman demo</span>
+  </div>
+
+  <div class="doc-cards">
+    <a href="/getting-started/" class="doc-card">
+      <span class="doc-card-tag">Start here</span>
+      <h3>Getting started</h3>
+      <p>Install Switchman, run the demo, and have agents coordinating in under 5 minutes.</p>
+      <span class="doc-card-arrow">Getting started →</span>
+    </a>
+    <a href="/claude-code/" class="doc-card">
+      <span class="doc-card-tag">Editor setup</span>
+      <h3>Claude Code setup</h3>
+      <p>Configure MCP, generate CLAUDE.md, and run multiple Claude Code agents without conflicts.</p>
+      <span class="doc-card-arrow">Claude Code setup →</span>
+    </a>
+    <a href="/cursor/" class="doc-card">
+      <span class="doc-card-tag">Editor setup</span>
+      <h3>Cursor setup</h3>
+      <p>Native MCP support for Cursor — set up once, agents coordinate automatically.</p>
+      <span class="doc-card-arrow">Cursor setup →</span>
+    </a>
+    <a href="/file-locking/" class="doc-card">
+      <span class="doc-card-tag">Core concepts</span>
+      <h3>How file locking works</h3>
+      <p>Understand tasks, leases, and claims — the three-layer model that prevents conflicts.</p>
+      <span class="doc-card-arrow">File locking →</span>
+    </a>
+    <a href="/command-reference/" class="doc-card">
+      <span class="doc-card-tag">Reference</span>
+      <h3>Command reference</h3>
+      <p>Complete list of every Switchman CLI command with descriptions and options.</p>
+      <span class="doc-card-arrow">Command reference →</span>
+    </a>
+    <a href="/pro/" class="doc-card">
+      <span class="doc-card-tag">Pro</span>
+      <h3>Pro &amp; login guide</h3>
+      <p>Subscribe, activate with switchman login, invite teammates, and use AI planning.</p>
+      <span class="doc-card-arrow">Pro guide →</span>
+    </a>
+  </div>
+
+  <hr class="section-divider">
+
+  <div class="quick-links-title">Quick links</div>
+  <div class="quick-links">
+    <a href="https://github.com/switchman-dev/switchman" class="quick-link">
+      GitHub repository
+      <span class="quick-link-arrow">↗</span>
+    </a>
+    <a href="https://discord.gg/pnT8BEC4D" class="quick-link">
+      Discord community
+      <span class="quick-link-arrow">↗</span>
+    </a>
+    <a href="https://switchman.dev/pro" class="quick-link">
+      Switchman Pro — unlimited agents from $25/month
+      <span class="quick-link-arrow">↗</span>
+    </a>
+    <a href="https://github.com/switchman-dev/switchman/issues" class="quick-link">
+      Report an issue
+      <span class="quick-link-arrow">↗</span>
+    </a>
+    <a href="mailto:hello@switchman.dev" class="quick-link">
+      hello@switchman.dev
+      <span class="quick-link-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+<script>
+function copyCmd(el) {
+  navigator.clipboard.writeText('npm install -g switchman-dev');
+  el.classList.add('copied');
+  el.querySelector('.copy-hint').textContent = 'copied!';
+  setTimeout(() => { el.classList.remove('copied'); el.querySelector('.copy-hint').textContent = 'copy'; }, 2000);
+}
+</script>
+
+</body>
+</html>

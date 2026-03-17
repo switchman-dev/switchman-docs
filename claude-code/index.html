@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Setup — Switchman Docs</title>
+  <meta name="description" content="Set up Switchman with Claude Code. Configure MCP, generate CLAUDE.md, and run multiple Claude Code agents on one codebase without conflicts.">
+  <link rel="canonical" href="https://docs.switchman.dev/claude-code/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+  </nav>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/">Getting started</a></li>
+        <li><a href="/claude-code/" class="active">Claude Code setup</a></li>
+        <li><a href="/cursor/">Cursor setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Claude Code setup</span>
+    </div>
+
+    <h1>Claude Code setup</h1>
+    <p class="doc-lead">Switchman has native MCP support for Claude Code. Once set up, Claude Code agents coordinate automatically — claiming files, picking up tasks, and avoiding conflicts without any manual intervention.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ</span>
+      <div class="callout-body"><strong>Prerequisites:</strong> Complete <a href="/getting-started/">Getting started</a> first. You need Switchman installed and <code>switchman setup --agents N</code> run in your repo.</div>
+    </div>
+
+    <h2>How it works</h2>
+    <p>When you run <code>switchman setup</code>, it writes a <code>.mcp.json</code> file in your repo root and in each agent workspace. Claude Code reads this file automatically and connects to the Switchman MCP server.</p>
+    <p>This gives Claude Code access to these tools:</p>
+
+    <table class="cmd-table">
+      <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>switchman_task_next</td><td>Get the next pending task from the queue</td></tr>
+        <tr><td>switchman_task_claim</td><td>Claim files the agent will edit</td></tr>
+        <tr><td>switchman_task_done</td><td>Mark a task complete and release claims</td></tr>
+        <tr><td>switchman_task_fail</td><td>Mark a task failed and release claims</td></tr>
+        <tr><td>switchman_write_file</td><td>Write a file through the governance gateway</td></tr>
+        <tr><td>switchman_status</td><td>Get a full system overview</td></tr>
+        <tr><td>switchman_scan</td><td>Scan for conflicts across all worktrees</td></tr>
+        <tr><td>switchman_lease_heartbeat</td><td>Refresh the agent's active lease</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Step 1 — Run setup</h2>
+    <p>If you haven't already:</p>
+    <pre><code>cd my-project
+switchman setup --agents 3</code></pre>
+
+    <p>This creates <code>.mcp.json</code> in the repo root and in each agent workspace automatically.</p>
+
+    <h2>Step 2 — Generate CLAUDE.md</h2>
+    <p>CLAUDE.md tells Claude Code how to use Switchman. Generate one tailored to your repo:</p>
+    <pre><code>switchman claude refresh</code></pre>
+
+    <p>This creates a <code>CLAUDE.md</code> file in the repo root with instructions like:</p>
+    <ul>
+      <li>How to call <code>switchman_task_next</code> at the start of each session</li>
+      <li>How to claim files before editing them</li>
+      <li>When to call <code>switchman_lease_heartbeat</code></li>
+      <li>How to mark tasks done or failed</li>
+      <li>What to do if a file claim is blocked</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">Commit <code>CLAUDE.md</code> to your repo. Every time Claude Code opens a workspace it will read these instructions and follow the coordination protocol automatically.</div>
+    </div>
+
+    <h2>Step 3 — Open one window per workspace</h2>
+    <p>Open a separate Claude Code window for each agent workspace:</p>
+    <pre><code># Open these folders in separate Claude Code windows:
+../my-project-agent1
+../my-project-agent2
+../my-project-agent3</code></pre>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body"><strong>Important:</strong> Open each agent workspace as its own Claude Code project — not as a subfolder inside the main repo. Each workspace has its own <code>.mcp.json</code> pointing to the shared coordination database.</div>
+    </div>
+
+    <h2>Step 4 — Verify the connection</h2>
+    <pre><code>switchman verify-setup</code></pre>
+
+    <p>You should see:</p>
+    <pre><code>OK    Project database — .switchman/switchman.db is ready
+OK    Agent workspaces — 3 agent workspace(s) registered
+OK    Claude Code MCP — .mcp.json is present in the repo root</code></pre>
+
+    <h2>Step 5 — Add tasks and start agents</h2>
+    <pre><code>switchman task add "Implement auth middleware" --priority 9
+switchman task add "Write auth tests" --priority 7
+switchman task add "Update auth docs" --priority 5</code></pre>
+
+    <p>Then in each Claude Code window, tell the agent to start working. With CLAUDE.md in place, Claude Code will:</p>
+    <ol>
+      <li>Call <code>switchman_task_next</code> to claim a task</li>
+      <li>Call <code>switchman_task_claim</code> to register the files it will edit</li>
+      <li>Write code using <code>switchman_write_file</code> or directly</li>
+      <li>Call <code>switchman_task_done</code> when finished</li>
+      <li>Repeat for the next task</li>
+    </ol>
+
+    <h2>Watching agents coordinate</h2>
+    <p>Keep this running in a separate terminal while agents work:</p>
+    <pre><code>switchman status --watch</code></pre>
+
+    <p>You'll see each agent's active task, which files are claimed, and any blocked collision attempts in real time.</p>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>Claude Code isn't picking up the MCP tools</h3>
+    <p>Check the <code>.mcp.json</code> exists in the workspace folder:</p>
+    <pre><code>cat .mcp.json</code></pre>
+    <p>It should point to the switchman-mcp binary. If it's missing, run <code>switchman setup --agents 3</code> again from the main repo.</p>
+
+    <h3>Agent says "no pending tasks"</h3>
+    <p>Either all tasks are claimed by other agents or the queue is empty. Check:</p>
+    <pre><code>switchman task list</code></pre>
+
+    <h3>File claim is blocked</h3>
+    <p>Another agent already owns that file. The blocked agent should pick a different task or wait. Run <code>switchman status</code> to see who owns the file.</p>
+
+    <nav class="page-nav">
+      <a href="/getting-started/" class="page-nav-card">
+        <div class="page-nav-label">← Previous</div>
+        <div class="page-nav-title">Getting started</div>
+      </a>
+      <a href="/cursor/" class="page-nav-card next">
+        <div class="page-nav-label">Next →</div>
+        <div class="page-nav-title">Cursor setup</div>
+      </a>
+    </nav>
+  </main>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — Switchman Docs</title>
+  <meta name="description" content="Install Switchman, run the demo, and have multiple AI coding agents coordinating on your repo in under 5 minutes.">
+  <link rel="canonical" href="https://docs.switchman.dev/getting-started/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/" class="active">Getting started</a></li>
+        <li><a href="/claude-code/">Claude Code setup</a></li>
+        <li><a href="/cursor/">Cursor setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Getting started</span>
+    </div>
+
+    <h1>Getting started</h1>
+    <p class="doc-lead">Install Switchman, run the demo, and have multiple AI coding agents coordinating on your repo in under 5 minutes.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ</span>
+      <div class="callout-body"><strong>Requirements:</strong> Node.js 22.5+ and Git 2.5+. Switchman uses Node's built-in <code>node:sqlite</code> module — no external database needed.</div>
+    </div>
+
+    <h2>1. Install</h2>
+    <p>Install Switchman globally via npm:</p>
+    <pre><span class="pre-label">terminal</span><code>npm install -g switchman-dev</code></pre>
+
+    <p>Confirm it's installed:</p>
+    <pre><code>switchman --version</code></pre>
+
+    <h2>2. Run the demo</h2>
+    <p>Before setting up a real repo, run the demo to see conflict prevention in action:</p>
+    <pre><code>switchman demo</code></pre>
+
+    <p>This creates a throwaway repo and shows:</p>
+    <ul>
+      <li>agent1 claiming <code>src/auth.js</code></li>
+      <li>agent2 being blocked from the same file</li>
+      <li>agent2 rerouting safely to <code>docs/auth-flow.md</code></li>
+      <li>both branches landing cleanly through the queue</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">You should see <strong>proof: agent2 was blocked from src/auth.js</strong> and <strong>final gate: clean</strong>. If you do, Switchman is working correctly.</div>
+    </div>
+
+    <h2>3. Set up your repo</h2>
+    <p>From inside any git repo, run:</p>
+    <pre><code>cd my-project
+switchman setup --agents 3</code></pre>
+
+    <p>This creates:</p>
+    <ul>
+      <li>A shared coordination database at <code>.switchman/switchman.db</code></li>
+      <li>Three linked agent workspaces: <code>../my-project-agent1</code>, <code>agent2</code>, <code>agent3</code></li>
+      <li>MCP config files for Claude Code and Cursor at <code>.mcp.json</code> and <code>.cursor/mcp.json</code></li>
+      <li>A background rogue-edit monitor</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">Run <code>switchman verify-setup</code> after setup to confirm your editor wiring is correct before starting agents.</div>
+    </div>
+
+    <h2>4. Add your first task</h2>
+    <pre><code>switchman task add "Add authentication middleware" --priority 9</code></pre>
+
+    <p>Priority is 1–10. Higher numbers are picked up first. Add as many tasks as you have work to do — agents will claim them automatically.</p>
+
+    <h2>5. Open your agents</h2>
+    <p>Open one Claude Code or Cursor window per agent workspace:</p>
+    <ul>
+      <li>Open <code>../my-project-agent1</code> in Claude Code</li>
+      <li>Open <code>../my-project-agent2</code> in Claude Code</li>
+      <li>Open <code>../my-project-agent3</code> in Claude Code</li>
+    </ul>
+
+    <p>Each agent window will automatically use the local MCP config to connect to Switchman. Agents call <code>switchman_task_next</code> to get their next task and <code>switchman_task_claim</code> to register which files they're editing.</p>
+
+    <h2>6. Watch it run</h2>
+    <p>Keep the status dashboard open while agents work:</p>
+    <pre><code>switchman status --watch</code></pre>
+
+    <p>You'll see agents appearing as they claim tasks, file claims being registered, conflicts being blocked, and completed tasks moving through the queue.</p>
+
+    <h2>7. Land the work</h2>
+    <p>When tasks are done, run the CI gate and then the merge queue:</p>
+    <pre><code>switchman gate ci
+switchman queue run</code></pre>
+
+    <p><code>gate ci</code> checks for conflicts, unclaimed changes, and stale work. If it passes, <code>queue run</code> lands each branch onto main one at a time.</p>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body"><strong>Free tier:</strong> supports up to 3 agents. Need more? Run <code>switchman upgrade</code> to see Switchman Pro.</div>
+    </div>
+
+    <h2>What's next</h2>
+    <ul>
+      <li><a href="/claude-code/">Claude Code setup guide</a> — editor-specific wiring and CLAUDE.md</li>
+      <li><a href="/cursor/">Cursor setup guide</a> — MCP configuration for Cursor</li>
+      <li><a href="/file-locking/">How file locking works</a> — understand claims, leases, and conflict prevention</li>
+      <li><a href="/command-reference/">Command reference</a> — full list of all commands</li>
+    </ul>
+
+    <nav class="page-nav">
+      <div></div>
+      <a href="/claude-code/" class="page-nav-card next">
+        <div class="page-nav-label">Next →</div>
+        <div class="page-nav-title">Claude Code setup</div>
+      </a>
+    </nav>
+  </main>
+
+</div>
+</body>
+</html>

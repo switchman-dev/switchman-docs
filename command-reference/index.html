@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Reference — Switchman Docs</title>
+  <meta name="description" content="Complete reference for all Switchman CLI commands — setup, tasks, leases, queue, status, gate, and more.">
+  <link rel="canonical" href="https://docs.switchman.dev/command-reference/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+  </nav>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/">Getting started</a></li>
+        <li><a href="/claude-code/">Claude Code setup</a></li>
+        <li><a href="/cursor/">Cursor setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/" class="active">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Command reference</span>
+    </div>
+
+    <h1>Command reference</h1>
+    <p class="doc-lead">All Switchman CLI commands. Run any command with <code>--help</code> to see its full options.</p>
+
+    <h2>Setup &amp; verification</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman setup --agents N</td><td>Create N agent workspaces, set up the coordination database, and write MCP config files. Run from your repo root.</td></tr>
+        <tr><td>switchman verify-setup</td><td>Check that the database, workspaces, and MCP config are all wired correctly.</td></tr>
+        <tr><td>switchman demo</td><td>Run a self-contained demo showing conflict prevention in a throwaway repo.</td></tr>
+        <tr><td>switchman demo --path /tmp/demo</td><td>Run the demo at a specific path.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Status &amp; monitoring</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman status</td><td>Show the full repo dashboard — health, active agents, blocked items, queue state, and next actions.</td></tr>
+        <tr><td>switchman status --watch</td><td>Live-updating dashboard. Refreshes automatically as agents work.</td></tr>
+        <tr><td>switchman status --json</td><td>Output status as JSON for scripting.</td></tr>
+        <tr><td>switchman scan</td><td>Scan all worktrees for conflicts, unclaimed changes, and stale work.</td></tr>
+        <tr><td>switchman monitor status</td><td>Check the background rogue-edit monitor.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Tasks</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman task add "title" --priority N</td><td>Add a task to the queue. Priority 1–10, higher = picked up first.</td></tr>
+        <tr><td>switchman task list</td><td>List all tasks with their status and priority.</td></tr>
+        <tr><td>switchman task done &lt;task-id&gt;</td><td>Mark a task as complete.</td></tr>
+        <tr><td>switchman task fail &lt;task-id&gt;</td><td>Mark a task as failed and requeue it.</td></tr>
+        <tr><td>switchman task remove &lt;task-id&gt;</td><td>Remove a task from the queue entirely.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Leases</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman lease next --worktree &lt;name&gt;</td><td>Claim the next pending task for a worktree. Returns the task and lease ID.</td></tr>
+        <tr><td>switchman lease heartbeat &lt;lease-id&gt;</td><td>Refresh a lease. Must be called at least every 60 seconds to keep the lease active.</td></tr>
+        <tr><td>switchman lease reap</td><td>Expire all stale leases and requeue their tasks.</td></tr>
+        <tr><td>switchman lease list</td><td>List all active leases.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>File claims</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman claim &lt;worktree&gt; &lt;files...&gt;</td><td>Claim one or more files for a worktree. Fails if any file is already claimed.</td></tr>
+        <tr><td>switchman claim --force &lt;worktree&gt; &lt;files...&gt;</td><td>Override an existing claim. Use only for operator-led recovery — not normal operation.</td></tr>
+        <tr><td>switchman explain claim &lt;file&gt;</td><td>Show who owns a file and what task they're working on.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Merge queue</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman queue add &lt;worktree&gt;</td><td>Add a finished worktree branch to the merge queue.</td></tr>
+        <tr><td>switchman queue status</td><td>Show the merge queue and each item's readiness.</td></tr>
+        <tr><td>switchman queue run</td><td>Process the queue — land each branch onto main in priority order.</td></tr>
+        <tr><td>switchman queue run --merge-budget N</td><td>Land at most N branches in this run.</td></tr>
+        <tr><td>switchman queue remove &lt;item-id&gt;</td><td>Remove an item from the queue.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Gate (CI checks)</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman gate ci</td><td>Run the repo gate — checks for conflicts, unclaimed changes, stale worktrees, and compliance issues.</td></tr>
+        <tr><td>switchman gate ci --github</td><td>Run the gate with GitHub Actions output formatting.</td></tr>
+        <tr><td>switchman gate install-ci</td><td>Install a GitHub Actions workflow that runs the gate on every push and PR.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Pro commands</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman login</td><td>Sign in with GitHub to activate your Pro licence.</td></tr>
+        <tr><td>switchman login --status</td><td>Check your current plan, email, and renewal date.</td></tr>
+        <tr><td>switchman logout</td><td>Sign out and remove saved credentials.</td></tr>
+        <tr><td>switchman upgrade</td><td>Open switchman.dev/pro in your browser.</td></tr>
+        <tr><td>switchman team invite &lt;email&gt;</td><td>Invite a teammate to your Pro team. Returns an invite token.</td></tr>
+        <tr><td>switchman login --invite &lt;token&gt;</td><td>Accept a team invite and join the shared coordination.</td></tr>
+        <tr><td>switchman team list</td><td>List all team members and their status.</td></tr>
+        <tr><td>switchman plan "goal"</td><td>Generate a parallel task plan from a goal description. Pro only.</td></tr>
+        <tr><td>switchman plan --apply</td><td>Create the planned tasks in the queue.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Utilities</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman claude refresh</td><td>Generate or update CLAUDE.md with Switchman coordination instructions.</td></tr>
+        <tr><td>switchman mcp install --windsurf</td><td>Install MCP config for Windsurf.</td></tr>
+        <tr><td>switchman audit verify</td><td>Verify the integrity of the audit trail.</td></tr>
+        <tr><td>switchman telemetry status</td><td>Check whether anonymous telemetry is enabled.</td></tr>
+        <tr><td>switchman telemetry enable</td><td>Enable anonymous usage telemetry.</td></tr>
+        <tr><td>switchman telemetry disable</td><td>Disable anonymous usage telemetry.</td></tr>
+      </tbody>
+    </table>
+
+    <nav class="page-nav">
+      <a href="/file-locking/" class="page-nav-card">
+        <div class="page-nav-label">← Previous</div>
+        <div class="page-nav-title">How file locking works</div>
+      </a>
+      <a href="/pro/" class="page-nav-card next">
+        <div class="page-nav-label">Next →</div>
+        <div class="page-nav-title">Pro &amp; login guide</div>
+      </a>
+    </nav>
+  </main>
+
+</div>
+</body>
+</html>

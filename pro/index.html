@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro &amp; Login Guide — Switchman Docs</title>
+  <meta name="description" content="How to subscribe to Switchman Pro, activate your licence with switchman login, and manage your team.">
+  <link rel="canonical" href="https://docs.switchman.dev/pro/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+  </nav>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/">Getting started</a></li>
+        <li><a href="/claude-code/">Claude Code setup</a></li>
+        <li><a href="/cursor/">Cursor setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/" class="active">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Pro &amp; login guide</span>
+    </div>
+
+    <h1>Pro &amp; login guide</h1>
+    <p class="doc-lead">Switchman Pro removes the 3-agent limit, adds cloud-synced team coordination, AI task planning, and 90-day history. Here's how to subscribe and activate.</p>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body"><strong>Free tier stays free forever.</strong> The MIT core — full CLI, MCP server, file locking, task queues, and merge queue — never requires a subscription. Pro is additive.</div>
+    </div>
+
+    <h2>What's included in Pro</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Feature</th><th>Free</th><th>Pro</th></tr></thead>
+      <tbody>
+        <tr><td>Concurrent agents</td><td>Up to 3</td><td>Unlimited</td></tr>
+        <tr><td>Full CLI and MCP server</td><td>✓</td><td>✓</td></tr>
+        <tr><td>File locking and conflict detection</td><td>✓</td><td>✓</td></tr>
+        <tr><td>Task history retention</td><td>7 days</td><td>90 days</td></tr>
+        <tr><td>Cloud-synced team activity</td><td>—</td><td>✓</td></tr>
+        <tr><td>Team invites</td><td>—</td><td>✓</td></tr>
+        <tr><td>AI task planning</td><td>—</td><td>✓</td></tr>
+        <tr><td>Email support</td><td>Community</td><td>48-hour reply</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Step 1 — Subscribe</h2>
+    <p>Open the Pro page from your terminal:</p>
+    <pre><code>switchman upgrade</code></pre>
+
+    <p>Or visit <a href="https://switchman.dev/pro">switchman.dev/pro</a> directly. Choose monthly ($25/month) or annual ($250/year). Sign in with GitHub, then complete checkout via Polar.sh.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ</span>
+      <div class="callout-body">Polar.sh acts as merchant of record — they handle VAT, sales tax, and billing automatically. Local taxes may apply depending on your location.</div>
+    </div>
+
+    <h2>Step 2 — Activate in your terminal</h2>
+    <p>After subscribing, run:</p>
+    <pre><code>switchman login</code></pre>
+
+    <p>This opens your browser to <code>switchman.dev/activate</code>. You'll see a short code like <code>SWIFT-4829</code> — confirm it matches what's shown in your terminal, then sign in with GitHub. Your terminal detects the authorization automatically within a few seconds.</p>
+
+    <pre><code>  Visit: https://switchman.dev/activate?code=SWIFT-4829
+  Your code: SWIFT-4829
+
+  Waiting for authorization...
+  ✓ Signed in as you@github.com
+  ✓ Pro licence verified — all features unlocked
+  ✓ Switchman Pro active
+  Plan: monthly
+  Renews: 4/16/2026</code></pre>
+
+    <h2>Step 3 — Verify and start using Pro</h2>
+    <pre><code>switchman login --status</code></pre>
+
+    <p>Should show your plan, email, and renewal date. Then run setup with more agents:</p>
+    <pre><code>switchman setup --agents 10</code></pre>
+
+    <p>Pro removes the 3-agent limit entirely.</p>
+
+    <h2>Inviting teammates</h2>
+    <p>Each seat is billed individually. To invite a teammate:</p>
+    <pre><code>switchman team invite alice@example.com</code></pre>
+
+    <p>This generates an invite token. Share it with your teammate:</p>
+    <pre><code># Your teammate runs this:
+switchman login --invite &lt;token&gt;</code></pre>
+
+    <p>They'll be added to your shared team coordination.</p>
+
+    <pre><code>switchman team list    # see all members and their status</code></pre>
+
+    <h2>AI task planning</h2>
+    <p>With Pro active, use the planning command:</p>
+    <pre><code>switchman plan "Add user authentication"</code></pre>
+
+    <p>Switchman reads your repo context — branch name, CLAUDE.md, recent git history — and proposes a parallel task breakdown. Review the plan, then apply it:</p>
+
+    <pre><code>switchman plan "Add user authentication" --apply</code></pre>
+
+    <p>This creates the tasks in the queue automatically, ready for agents to pick up.</p>
+
+    <h2>Credentials and offline use</h2>
+    <p>After login, credentials are saved to <code>~/.switchman/credentials.json</code>. The licence check is cached locally for 24 hours — you don't need internet access for every command.</p>
+    <p>If you're offline, Switchman uses the cached credentials for up to 7 days before requiring a reconnect.</p>
+
+    <h2>Signing out</h2>
+    <pre><code>switchman logout</code></pre>
+
+    <p>This removes saved credentials. Pro features will be unavailable until you run <code>switchman login</code> again.</p>
+
+    <h2>Cancelling</h2>
+    <p>Cancel through <a href="https://polar.sh">Polar.sh</a> — your subscription runs until the end of the billing period then stops. Your local SQLite data and history are always yours and are not affected by cancellation.</p>
+
+    <h2>Getting help</h2>
+    <p>Pro subscribers get email support with a 48-hour reply time. Email <a href="mailto:hello@switchman.dev">hello@switchman.dev</a> with your subscription email and we'll help you out.</p>
+
+    <nav class="page-nav">
+      <a href="/command-reference/" class="page-nav-card">
+        <div class="page-nav-label">← Previous</div>
+        <div class="page-nav-title">Command reference</div>
+      </a>
+      <div></div>
+    </nav>
+  </main>
+
+</div>
+</body>
+</html>
