@@ -37,6 +37,7 @@
         <li><a href="/getting-started/">Getting started</a></li>
         <li><a href="/claude-code/" class="active">Claude Code setup</a></li>
         <li><a href="/cursor/">Cursor setup</a></li>
+        <li><a href="/windsurf/">Windsurf setup</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -67,16 +68,40 @@
     </div>
 
     <h1>Claude Code setup</h1>
-    <p class="doc-lead">Switchman has native MCP support for Claude Code. Once set up, Claude Code agents coordinate automatically — claiming files, picking up tasks, and avoiding conflicts without any manual intervention.</p>
+    <p class="doc-lead">Claude Code has native Switchman integration via MCP, so agents can coordinate automatically instead of relying on shell rituals or hand-managed work splits.</p>
 
     <div class="callout callout-info">
       <span class="callout-icon">ℹ</span>
-      <div class="callout-body"><strong>Prerequisites:</strong> Complete <a href="/getting-started/">Getting started</a> first. You need Switchman installed and <code>switchman setup --agents N</code> run in your repo.</div>
+      <div class="callout-body"><strong>Prerequisites:</strong> Complete <a href="/getting-started/">Getting started</a> first. The fastest path is <code>switchman start "Your goal"</code>, but the manual <code>switchman setup --agents N</code> flow still works too.</div>
     </div>
 
-    <h2>How it works</h2>
-    <p>When you run <code>switchman setup</code>, it writes a <code>.mcp.json</code> file in your repo root and in each agent workspace. Claude Code reads this file automatically and connects to the Switchman MCP server.</p>
-    <p>This gives Claude Code access to these tools:</p>
+    <h2>1. Create your agent workspaces</h2>
+    <pre><code>cd my-project
+switchman setup --agents 5
+switchman verify-setup</code></pre>
+
+    <p>This creates isolated workspaces, the shared Switchman database, and project-local <code>.mcp.json</code> files so Claude Code can discover Switchman automatically.</p>
+
+    <h2>2. Optional global fallback</h2>
+    <p>If you prefer a global fallback, add this to <code>~/.claude/claude_desktop_config.json</code>:</p>
+    <pre><code>{
+  "mcpServers": {
+    "switchman": {
+      "command": "switchman-mcp",
+      "args": []
+    }
+  }
+}</code></pre>
+
+    <p>Project-local config is still the preferred path because it travels with the repo and generated workspaces.</p>
+
+    <h2>3. Generate a repo-aware <code>CLAUDE.md</code></h2>
+    <pre><code>switchman claude refresh</code></pre>
+
+    <p>This generates a repo-aware guide in the repo root so agents know which Switchman tools and repo conventions to follow. Keep it in the repo root and do not have agents talk to <code>.switchman/switchman.db</code> directly.</p>
+
+    <h2>4. Claude Code tools</h2>
+    <p>Once the local MCP config is in place, Claude Code can use tools like:</p>
 
     <table class="cmd-table">
       <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
@@ -92,18 +117,7 @@
       </tbody>
     </table>
 
-    <h2>Step 1 — Run setup</h2>
-    <p>If you haven't already:</p>
-    <pre><code>cd my-project
-switchman setup --agents 3</code></pre>
-
-    <p>This creates <code>.mcp.json</code> in the repo root and in each agent workspace automatically.</p>
-
-    <h2>Step 2 — Generate CLAUDE.md</h2>
-    <p>CLAUDE.md tells Claude Code how to use Switchman. Generate one tailored to your repo:</p>
-    <pre><code>switchman claude refresh</code></pre>
-
-    <p>This creates a <code>CLAUDE.md</code> file in the repo root with instructions like:</p>
+    <p><code>CLAUDE.md</code> typically tells Claude Code things like:</p>
     <ul>
       <li>How to call <code>switchman_task_next</code> at the start of each session</li>
       <li>How to claim files before editing them</li>
@@ -117,7 +131,12 @@ switchman setup --agents 3</code></pre>
       <div class="callout-body">Commit <code>CLAUDE.md</code> to your repo. Every time Claude Code opens a workspace it will read these instructions and follow the coordination protocol automatically.</div>
     </div>
 
-    <h2>Step 3 — Open one window per workspace</h2>
+    <h2>5. Add your tasks</h2>
+    <pre><code>switchman task add "Fix the login bug" --priority 8
+switchman task add "Add rate limiting" --priority 6
+switchman task add "Update README" --priority 2</code></pre>
+
+    <h2>6. Open one window per workspace</h2>
     <p>Open a separate Claude Code window for each agent workspace:</p>
     <pre><code># Open these folders in separate Claude Code windows:
 ../my-project-agent1
@@ -129,24 +148,11 @@ switchman setup --agents 3</code></pre>
       <div class="callout-body"><strong>Important:</strong> Open each agent workspace as its own Claude Code project — not as a subfolder inside the main repo. Each workspace has its own <code>.mcp.json</code> pointing to the shared coordination database.</div>
     </div>
 
-    <h2>Step 4 — Verify the connection</h2>
-    <pre><code>switchman verify-setup</code></pre>
-
-    <p>You should see:</p>
-    <pre><code>OK    Project database — .switchman/switchman.db is ready
-OK    Agent workspaces — 3 agent workspace(s) registered
-OK    Claude Code MCP — .mcp.json is present in the repo root</code></pre>
-
-    <h2>Step 5 — Add tasks and start agents</h2>
-    <pre><code>switchman task add "Implement auth middleware" --priority 9
-switchman task add "Write auth tests" --priority 7
-switchman task add "Update auth docs" --priority 5</code></pre>
-
-    <p>Then in each Claude Code window, tell the agent to start working. With CLAUDE.md in place, Claude Code will:</p>
+    <p>With <code>CLAUDE.md</code> in place, Claude Code will:</p>
     <ol>
       <li>Call <code>switchman_task_next</code> to claim a task</li>
       <li>Call <code>switchman_task_claim</code> to register the files it will edit</li>
-      <li>Write code using <code>switchman_write_file</code> or directly</li>
+      <li>Prefer the governed write tools when appropriate</li>
       <li>Call <code>switchman_task_done</code> when finished</li>
       <li>Repeat for the next task</li>
     </ol>

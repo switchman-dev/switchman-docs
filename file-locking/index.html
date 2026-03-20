@@ -37,6 +37,7 @@
         <li><a href="/getting-started/">Getting started</a></li>
         <li><a href="/claude-code/">Claude Code setup</a></li>
         <li><a href="/cursor/">Cursor setup</a></li>
+        <li><a href="/windsurf/">Windsurf setup</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -67,7 +68,7 @@
     </div>
 
     <h1>How file locking works</h1>
-    <p class="doc-lead">Switchman prevents file conflicts using a three-layer model: tasks, leases, and claims. Understanding this model helps you get the most out of parallel agent coordination.</p>
+    <p class="doc-lead">Switchman prevents file conflicts using a three-layer model: tasks, leases, and claims. On newer governed workflows, those claims also feed the write gateway and landing checks.</p>
 
     <h2>The problem it solves</h2>
     <p>When two AI agents edit the same file simultaneously, you get a merge conflict. In the best case it's annoying to resolve. In the worst case — when both agents have made significant changes to the same file — one agent's work gets thrown away entirely.</p>
@@ -140,7 +141,7 @@ switchman_write_file
 
 # CLI equivalent
 switchman write &lt;path&gt; &lt;content&gt;</code></pre>
-    <p>The gateway checks that the agent has an active claim on the file before allowing the write. Direct file system writes are not blocked — but they are detected by the background monitor:</p>
+    <p>Related MCP tools include <code>switchman_append_file</code>, <code>switchman_make_directory</code>, <code>switchman_move_path</code>, and <code>switchman_remove_path</code>. The gateway checks that the agent has an active claim on the file before allowing the write. Direct file system writes are not blocked, but they are detected by the background monitor:</p>
     <pre><code>switchman monitor status    # check for rogue edits</code></pre>
 
     <h2>Concurrency model</h2>

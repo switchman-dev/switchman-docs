@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Command Reference — Switchman Docs</title>
-  <meta name="description" content="Complete reference for all Switchman CLI commands — setup, tasks, leases, queue, status, gate, and more.">
+  <meta name="description" content="Complete reference for the current Switchman CLI — quickcheck, start, setup, tasks, leases, pipelines, queue, policy, telemetry, and more.">
   <link rel="canonical" href="https://docs.switchman.dev/command-reference/">
   <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,6 +37,7 @@
         <li><a href="/getting-started/">Getting started</a></li>
         <li><a href="/claude-code/">Claude Code setup</a></li>
         <li><a href="/cursor/">Cursor setup</a></li>
+        <li><a href="/windsurf/">Windsurf setup</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -67,7 +68,18 @@
     </div>
 
     <h1>Command reference</h1>
-    <p class="doc-lead">All Switchman CLI commands. Run any command with <code>--help</code> to see its full options.</p>
+    <p class="doc-lead">The most relevant current Switchman CLI commands. Run any command with <code>--help</code> to see full options.</p>
+
+    <h2>Current first-run flow</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman quickcheck</td><td>Check repo readiness and print one exact next command.</td></tr>
+        <tr><td>switchman start "goal"</td><td>Fastest guided path. Creates or refreshes workspaces, local MCP config, and task planning for a new run.</td></tr>
+        <tr><td>switchman start "goal" --agents 4 --yes</td><td>Run the guided start flow non-interactively with a specific agent count.</td></tr>
+        <tr><td>switchman session-summary</td><td>Show a compact summary of what Switchman coordinated in the recent session.</td></tr>
+      </tbody>
+    </table>
 
     <h2>Setup &amp; verification</h2>
     <table class="cmd-table">
@@ -75,6 +87,7 @@
       <tbody>
         <tr><td>switchman setup --agents N</td><td>Create N agent workspaces, set up the coordination database, and write MCP config files. Run from your repo root.</td></tr>
         <tr><td>switchman verify-setup</td><td>Check that the database, workspaces, and MCP config are all wired correctly.</td></tr>
+        <tr><td>switchman init</td><td>Initialise Switchman in the current git repo without creating extra workspaces.</td></tr>
         <tr><td>switchman demo</td><td>Run a self-contained demo showing conflict prevention in a throwaway repo.</td></tr>
         <tr><td>switchman demo --path /tmp/demo</td><td>Run the demo at a specific path.</td></tr>
       </tbody>
@@ -88,6 +101,10 @@
         <tr><td>switchman status --watch</td><td>Live-updating dashboard. Refreshes automatically as agents work.</td></tr>
         <tr><td>switchman status --json</td><td>Output status as JSON for scripting.</td></tr>
         <tr><td>switchman scan</td><td>Scan all worktrees for conflicts, unclaimed changes, and stale work.</td></tr>
+        <tr><td>switchman explain claim &lt;file&gt;</td><td>Explain who owns a file and what task they are working on.</td></tr>
+        <tr><td>switchman explain queue &lt;item-id&gt;</td><td>Explain why a queue item is blocked, retrying, or ready.</td></tr>
+        <tr><td>switchman explain stale --pipeline &lt;pipeline-id&gt;</td><td>Explain stale waves and which tasks need to be retried.</td></tr>
+        <tr><td>switchman explain landing &lt;pipeline-id&gt;</td><td>Explain the current landing branch or recovery state for a pipeline.</td></tr>
         <tr><td>switchman monitor status</td><td>Check the background rogue-edit monitor.</td></tr>
       </tbody>
     </table>
@@ -98,9 +115,11 @@
       <tbody>
         <tr><td>switchman task add "title" --priority N</td><td>Add a task to the queue. Priority 1–10, higher = picked up first.</td></tr>
         <tr><td>switchman task list</td><td>List all tasks with their status and priority.</td></tr>
+        <tr><td>switchman task next --worktree &lt;name&gt;</td><td>Quickly get and lease the next pending task for a workspace.</td></tr>
+        <tr><td>switchman task retry &lt;task-id&gt;</td><td>Return a failed or stale-completed task to pending.</td></tr>
+        <tr><td>switchman task retry-stale --pipeline &lt;pipeline-id&gt;</td><td>Reset the stale tasks for one pipeline back to pending together.</td></tr>
         <tr><td>switchman task done &lt;task-id&gt;</td><td>Mark a task as complete.</td></tr>
         <tr><td>switchman task fail &lt;task-id&gt;</td><td>Mark a task as failed and requeue it.</td></tr>
-        <tr><td>switchman task remove &lt;task-id&gt;</td><td>Remove a task from the queue entirely.</td></tr>
       </tbody>
     </table>
 
@@ -112,6 +131,8 @@
         <tr><td>switchman lease heartbeat &lt;lease-id&gt;</td><td>Refresh a lease. Must be called at least every 60 seconds to keep the lease active.</td></tr>
         <tr><td>switchman lease reap</td><td>Expire all stale leases and requeue their tasks.</td></tr>
         <tr><td>switchman lease list</td><td>List all active leases.</td></tr>
+        <tr><td>switchman lease policy</td><td>Show the current stale-lease policy.</td></tr>
+        <tr><td>switchman lease policy set</td><td>Update automatic lease-reaping behaviour for the repo.</td></tr>
       </tbody>
     </table>
 
@@ -119,9 +140,11 @@
     <table class="cmd-table">
       <thead><tr><th>Command</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>switchman claim &lt;worktree&gt; &lt;files...&gt;</td><td>Claim one or more files for a worktree. Fails if any file is already claimed.</td></tr>
+        <tr><td>switchman claim &lt;task-id&gt; &lt;worktree&gt; &lt;files...&gt;</td><td>Claim one or more files for a task and worktree. Fails if any file is already claimed.</td></tr>
         <tr><td>switchman claim --force &lt;worktree&gt; &lt;files...&gt;</td><td>Override an existing claim. Use only for operator-led recovery — not normal operation.</td></tr>
-        <tr><td>switchman explain claim &lt;file&gt;</td><td>Show who owns a file and what task they're working on.</td></tr>
+        <tr><td>switchman release &lt;task-id&gt;</td><td>Release active file claims for a task during manual recovery.</td></tr>
+        <tr><td>switchman write &lt;path&gt; &lt;content&gt;</td><td>Write through the governed gateway so claim rules are enforced.</td></tr>
+        <tr><td>switchman wrap &lt;command...&gt;</td><td>Run a shell command through Switchman’s enforcement layer.</td></tr>
       </tbody>
     </table>
 
@@ -129,21 +152,51 @@
     <table class="cmd-table">
       <thead><tr><th>Command</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>switchman queue add &lt;worktree&gt;</td><td>Add a finished worktree branch to the merge queue.</td></tr>
+        <tr><td>switchman queue add &lt;branch&gt;</td><td>Add a finished branch to the merge queue.</td></tr>
+        <tr><td>switchman queue add --worktree &lt;name&gt;</td><td>Add a finished worktree branch to the merge queue.</td></tr>
+        <tr><td>switchman queue add --pipeline &lt;pipeline-id&gt;</td><td>Queue a pipeline’s inferred landing branch, including synthetic landing branches when needed.</td></tr>
+        <tr><td>switchman queue list</td><td>List queue items with retry and escalation state.</td></tr>
         <tr><td>switchman queue status</td><td>Show the merge queue and each item's readiness.</td></tr>
         <tr><td>switchman queue run</td><td>Process the queue — land each branch onto main in priority order.</td></tr>
+        <tr><td>switchman queue run --follow-plan</td><td>Only run queue items that are currently in the <code>land_now</code> lane.</td></tr>
         <tr><td>switchman queue run --merge-budget N</td><td>Land at most N branches in this run.</td></tr>
+        <tr><td>switchman queue retry &lt;item-id&gt;</td><td>Retry a blocked or held queue item after intervention.</td></tr>
         <tr><td>switchman queue remove &lt;item-id&gt;</td><td>Remove an item from the queue.</td></tr>
       </tbody>
     </table>
 
-    <h2>Gate (CI checks)</h2>
+    <h2>Pipelines &amp; governed landing</h2>
+    <table class="cmd-table">
+      <thead><tr><th>Command</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>switchman pipeline start "title"</td><td>Create a tracked pipeline and split one goal into structured subtasks.</td></tr>
+        <tr><td>switchman pipeline exec &lt;pipeline-id&gt; "/path/to/agent-command"</td><td>Run a pipeline through one agent command and record structured outcomes.</td></tr>
+        <tr><td>switchman pipeline status &lt;pipeline-id&gt;</td><td>Show what is running, blocked, policy-gated, or ready to land.</td></tr>
+        <tr><td>switchman pipeline pr &lt;pipeline-id&gt;</td><td>Generate a PR-ready summary for the pipeline.</td></tr>
+        <tr><td>switchman pipeline bundle &lt;pipeline-id&gt;</td><td>Export reviewer-ready pipeline artifacts to disk.</td></tr>
+        <tr><td>switchman pipeline comment &lt;pipeline-id&gt;</td><td>Post or update the pipeline landing summary on a PR.</td></tr>
+        <tr><td>switchman pipeline sync-pr &lt;pipeline-id&gt;</td><td>Bundle artifacts, update the PR comment, and write GitHub outputs in one step.</td></tr>
+        <tr><td>switchman pipeline publish &lt;pipeline-id&gt;</td><td>Create the hosted PR once the landing state is ready.</td></tr>
+        <tr><td>switchman pipeline land &lt;pipeline-id&gt;</td><td>Materialize or inspect the landing branch for a pipeline.</td></tr>
+        <tr><td>switchman pipeline land &lt;pipeline-id&gt; --refresh</td><td>Refresh a stale synthetic landing branch after branches moved.</td></tr>
+        <tr><td>switchman pipeline land &lt;pipeline-id&gt; --recover</td><td>Open a guided recovery worktree for landing conflicts.</td></tr>
+        <tr><td>switchman pipeline land &lt;pipeline-id&gt; --resume</td><td>Resume landing after recovery work is committed.</td></tr>
+        <tr><td>switchman pipeline land &lt;pipeline-id&gt; --cleanup</td><td>Clean up temporary landing recovery resources.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Gate, policy &amp; CI</h2>
     <table class="cmd-table">
       <thead><tr><th>Command</th><th>Description</th></tr></thead>
       <tbody>
         <tr><td>switchman gate ci</td><td>Run the repo gate — checks for conflicts, unclaimed changes, stale worktrees, and compliance issues.</td></tr>
         <tr><td>switchman gate ci --github</td><td>Run the gate with GitHub Actions output formatting.</td></tr>
         <tr><td>switchman gate install-ci</td><td>Install a GitHub Actions workflow that runs the gate on every push and PR.</td></tr>
+        <tr><td>switchman policy init</td><td>Write a starter enforcement policy for generated-path exceptions.</td></tr>
+        <tr><td>switchman policy init-change</td><td>Write a starter change policy for governed domains like auth, payments, and schema.</td></tr>
+        <tr><td>switchman policy show-change</td><td>Show the active change policy for the repo.</td></tr>
+        <tr><td>switchman policy override &lt;pipeline-id&gt; --task-types tests --reason "why"</td><td>Record an explicit policy override for a pipeline requirement.</td></tr>
+        <tr><td>switchman policy list-overrides &lt;pipeline-id&gt;</td><td>List policy overrides for a pipeline.</td></tr>
       </tbody>
     </table>
 
@@ -159,7 +212,9 @@
         <tr><td>switchman login --invite &lt;token&gt;</td><td>Accept a team invite and join the shared coordination.</td></tr>
         <tr><td>switchman team list</td><td>List all team members and their status.</td></tr>
         <tr><td>switchman plan "goal"</td><td>Generate a parallel task plan from a goal description. Pro only.</td></tr>
-        <tr><td>switchman plan --apply</td><td>Create the planned tasks in the queue.</td></tr>
+        <tr><td>switchman plan "goal" --apply</td><td>Create the planned tasks in the queue.</td></tr>
+        <tr><td>switchman plan --issue 47</td><td>Generate a plan directly from a GitHub issue.</td></tr>
+        <tr><td>switchman plan --issue 47 --apply --comment</td><td>Apply the issue plan and comment the summary back to the issue or PR.</td></tr>
       </tbody>
     </table>
 
@@ -170,9 +225,11 @@
         <tr><td>switchman claude refresh</td><td>Generate or update CLAUDE.md with Switchman coordination instructions.</td></tr>
         <tr><td>switchman mcp install --windsurf</td><td>Install MCP config for Windsurf.</td></tr>
         <tr><td>switchman audit verify</td><td>Verify the integrity of the audit trail.</td></tr>
+        <tr><td>switchman advanced brew-formula --sha256 &lt;sha&gt; --output Formula/switchman-dev.rb</td><td>Generate the Homebrew formula used during releases.</td></tr>
         <tr><td>switchman telemetry status</td><td>Check whether anonymous telemetry is enabled.</td></tr>
         <tr><td>switchman telemetry enable</td><td>Enable anonymous usage telemetry.</td></tr>
         <tr><td>switchman telemetry disable</td><td>Disable anonymous usage telemetry.</td></tr>
+        <tr><td>switchman telemetry test</td><td>Send one test telemetry event and report whether delivery succeeded.</td></tr>
       </tbody>
     </table>
 

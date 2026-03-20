@@ -39,6 +39,7 @@
         <li><a href="/getting-started/" class="active">Getting started</a></li>
         <li><a href="/claude-code/">Claude Code setup</a></li>
         <li><a href="/cursor/">Cursor setup</a></li>
+        <li><a href="/windsurf/">Windsurf setup</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -70,7 +71,7 @@
     </div>
 
     <h1>Getting started</h1>
-    <p class="doc-lead">Install Switchman, run the demo, and have multiple AI coding agents coordinating on your repo in under 5 minutes.</p>
+    <p class="doc-lead">Install Switchman, run the demo, then use the newer guided flow with <code>switchman quickcheck</code> and <code>switchman start</code> to get coordinated AI work running quickly.</p>
 
     <div class="callout callout-info">
       <span class="callout-icon">ℹ</span>
@@ -101,61 +102,63 @@
       <div class="callout-body">You should see <strong>proof: agent2 was blocked from src/auth.js</strong> and <strong>final gate: clean</strong>. If you do, Switchman is working correctly.</div>
     </div>
 
-    <h2>3. Set up your repo</h2>
-    <p>From inside any git repo, run:</p>
+    <h2>3. Check your repo and get the next command</h2>
+    <p>From inside any git repo, start with:</p>
     <pre><code>cd my-project
-switchman setup --agents 3</code></pre>
+switchman quickcheck</code></pre>
 
-    <p>This creates:</p>
+    <p><code>quickcheck</code> gives you one readiness summary and one exact next command. On a healthy repo that is usually:</p>
+    <pre><code>switchman start "Add authentication middleware"</code></pre>
+
+    <h2>4. Start the guided flow</h2>
+    <p>Use <code>start</code> when you want the shortest path:</p>
+    <pre><code>switchman start "Add authentication middleware"</code></pre>
+
+    <p>This creates or refreshes:</p>
     <ul>
-      <li>A shared coordination database at <code>.switchman/switchman.db</code></li>
-      <li>Three linked agent workspaces: <code>../my-project-agent1</code>, <code>agent2</code>, <code>agent3</code></li>
-      <li>MCP config files for Claude Code and Cursor at <code>.mcp.json</code> and <code>.cursor/mcp.json</code></li>
-      <li>A background rogue-edit monitor</li>
+      <li>A shared coordination database at <code>.switchman/</code></li>
+      <li>Linked agent workspaces for the run</li>
+      <li>Repo-local MCP config for Claude Code and Cursor</li>
+      <li>A repo-aware <code>CLAUDE.md</code> when one does not already exist</li>
     </ul>
 
     <div class="callout callout-tip">
       <span class="callout-icon">✓</span>
-      <div class="callout-body">Run <code>switchman verify-setup</code> after setup to confirm your editor wiring is correct before starting agents.</div>
+      <div class="callout-body">If editor wiring feels off later, run <code>switchman verify-setup</code>. If you want to regenerate the repo guide, run <code>switchman claude refresh</code>.</div>
     </div>
 
-    <h2>4. Add your first task</h2>
-    <pre><code>switchman task add "Add authentication middleware" --priority 9</code></pre>
-
-    <p>Priority is 1–10. Higher numbers are picked up first. Add as many tasks as you have work to do — agents will claim them automatically.</p>
-
     <h2>5. Open your agents</h2>
-    <p>Open one Claude Code or Cursor window per agent workspace:</p>
-    <ul>
-      <li>Open <code>../my-project-agent1</code> in Claude Code</li>
-      <li>Open <code>../my-project-agent2</code> in Claude Code</li>
-      <li>Open <code>../my-project-agent3</code> in Claude Code</li>
-    </ul>
+    <p>Open one Claude Code, Cursor, or Windsurf window per generated workspace.</p>
 
-    <p>Each agent window will automatically use the local MCP config to connect to Switchman. Agents call <code>switchman_task_next</code> to get their next task and <code>switchman_task_claim</code> to register which files they're editing.</p>
+    <p>Each agent window uses Switchman through MCP to pick work, claim files, and stay out of each other’s way.</p>
 
     <h2>6. Watch it run</h2>
     <p>Keep the status dashboard open while agents work:</p>
     <pre><code>switchman status --watch</code></pre>
 
-    <p>You'll see agents appearing as they claim tasks, file claims being registered, conflicts being blocked, and completed tasks moving through the queue.</p>
+    <p>After the first session, run:</p>
+    <pre><code>switchman session-summary</code></pre>
+
+    <p>This gives you a compact summary of what Switchman coordinated.</p>
 
     <h2>7. Land the work</h2>
     <p>When tasks are done, run the CI gate and then the merge queue:</p>
     <pre><code>switchman gate ci
 switchman queue run</code></pre>
 
-    <p><code>gate ci</code> checks for conflicts, unclaimed changes, and stale work. If it passes, <code>queue run</code> lands each branch onto main one at a time.</p>
+    <p><code>gate ci</code> checks for conflicts, unclaimed changes, stale work, and policy issues. If it passes, <code>queue run</code> lands finished work safely.</p>
 
-    <div class="callout callout-tip">
-      <span class="callout-icon">✓</span>
-      <div class="callout-body"><strong>Free tier:</strong> supports up to 3 agents. Need more? Run <code>switchman upgrade</code> to see Switchman Pro.</div>
-    </div>
+    <h2>Manual path</h2>
+    <p>If you want full control instead of the guided flow, use the older explicit setup:</p>
+    <pre><code>switchman setup --agents 5
+switchman task add "Add authentication middleware" --priority 9
+switchman verify-setup</code></pre>
 
     <h2>What's next</h2>
     <ul>
       <li><a href="/claude-code/">Claude Code setup guide</a> — editor-specific wiring and CLAUDE.md</li>
       <li><a href="/cursor/">Cursor setup guide</a> — MCP configuration for Cursor</li>
+      <li><a href="/windsurf/">Windsurf setup guide</a> — one-time MCP installation for Windsurf</li>
       <li><a href="/file-locking/">How file locking works</a> — understand claims, leases, and conflict prevention</li>
       <li><a href="/command-reference/">Command reference</a> — full list of all commands</li>
     </ul>

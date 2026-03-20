@@ -37,6 +37,7 @@
         <li><a href="/getting-started/">Getting started</a></li>
         <li><a href="/claude-code/">Claude Code setup</a></li>
         <li><a href="/cursor/" class="active">Cursor setup</a></li>
+        <li><a href="/windsurf/">Windsurf setup</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -71,7 +72,7 @@
 
     <div class="callout callout-info">
       <span class="callout-icon">ℹ</span>
-      <div class="callout-body"><strong>Prerequisites:</strong> Complete <a href="/getting-started/">Getting started</a> first. You need Switchman installed and <code>switchman setup --agents N</code> run in your repo.</div>
+      <div class="callout-body"><strong>Prerequisites:</strong> Complete <a href="/getting-started/">Getting started</a> first. Cursor works with the normal Switchman workspace flow, whether that came from <code>switchman start</code> or manual <code>switchman setup --agents N</code>.</div>
     </div>
 
     <h2>How Cursor MCP works</h2>
@@ -82,11 +83,12 @@
       <div class="callout-body">Unlike some MCP integrations, Switchman's Cursor config requires <strong>no API keys or manual configuration</strong>. The <code>.cursor/mcp.json</code> file is self-contained.</div>
     </div>
 
-    <h2>Step 1 — Run setup</h2>
+    <h2>Step 1 — Create your agent workspaces</h2>
     <pre><code>cd my-project
-switchman setup --agents 3</code></pre>
+switchman setup --agents 5
+switchman verify-setup</code></pre>
 
-    <p>This creates <code>.cursor/mcp.json</code> in both the main repo and each agent workspace.</p>
+    <p>This writes <code>.cursor/mcp.json</code> into the repo root and each generated workspace.</p>
 
     <h2>Step 2 — Verify MCP config</h2>
     <pre><code>cat .cursor/mcp.json</code></pre>
@@ -122,14 +124,13 @@ cursor ../my-project-agent3</code></pre>
     </ul>
 
     <h2>Step 5 — Add tasks and start agents</h2>
-    <pre><code>switchman task add "Implement payment webhook" --priority 9
-switchman task add "Add webhook tests" --priority 7</code></pre>
+    <pre><code>switchman task add "Fix the login bug" --priority 8
+switchman task add "Add rate limiting" --priority 6
+switchman task add "Update README" --priority 2</code></pre>
 
-    <p>Tell each Cursor agent to start working. A good prompt to start an agent session:</p>
-    <pre><span class="pre-label">cursor agent prompt</span><code>Use the switchman_task_next tool to get your next task.
-Claim the files you need with switchman_task_claim before editing them.
-When done, call switchman_task_done.
-Check CLAUDE.md for coordination instructions.</code></pre>
+    <p>Tell each Cursor agent to start working. A short prompt that works well is:</p>
+    <pre><span class="pre-label">cursor agent prompt</span><code>Use the Switchman MCP tools for coordination.
+Get your next task, claim files before editing them, and check CLAUDE.md for repo instructions.</code></pre>
 
     <h2>Step 6 — Watch the dashboard</h2>
     <pre><code>switchman status --watch</code></pre>
@@ -154,9 +155,9 @@ Check CLAUDE.md for coordination instructions.</code></pre>
         <div class="page-nav-label">← Previous</div>
         <div class="page-nav-title">Claude Code setup</div>
       </a>
-      <a href="/file-locking/" class="page-nav-card next">
+      <a href="/windsurf/" class="page-nav-card next">
         <div class="page-nav-label">Next →</div>
-        <div class="page-nav-title">How file locking works</div>
+        <div class="page-nav-title">Windsurf setup</div>
       </a>
     </nav>
   </main>

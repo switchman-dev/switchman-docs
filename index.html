@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Switchman Docs — The Operating System for Parallel AI Development</title>
-  <meta name="description" content="Documentation for Switchman — install, set up Claude Code or Cursor, understand file locking, and use Switchman Pro.">
+  <meta name="description" content="Documentation for Switchman — install, run quickcheck or start, set up Claude Code, Cursor, or Windsurf, and use governed landing workflows.">
   <link rel="canonical" href="https://docs.switchman.dev/">
   <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +46,7 @@
 <!-- Simple nav for homepage - no sidebar needed -->
 <nav class="top-nav" style="grid-column: 1/-1;">
   <a href="https://switchman.dev" class="nav-logo">
-    <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+    <img src="switchman-logo.svg" width="20" height="20" alt="Switchman">
     switchman
     <span class="nav-logo-badge">docs</span>
   </a>
@@ -62,14 +62,14 @@
 <div class="docs-home">
   <span class="home-kicker">Documentation</span>
   <h1 class="home-title">Everything you need to get started with Switchman</h1>
-  <p class="home-sub"> </p>
+  <p class="home-sub">Install Switchman, prove the workflow with the demo, then use <code>switchman quickcheck</code> or <code>switchman start</code> to boot coordinated multi-agent work with the current guided flow.</p>
 
   <div class="quick-install">
     <div class="install-pill" onclick="copyCmd(this)" role="button">
       <span>$ npm install -g switchman-dev</span>
       <span class="copy-hint">copy</span>
     </div>
-    <span class="install-sub">then: switchman demo</span>
+    <span class="install-sub">then: switchman quickcheck</span>
   </div>
 
   <div class="doc-cards">
@@ -91,6 +91,12 @@
       <p>Native MCP support for Cursor — set up once, agents coordinate automatically.</p>
       <span class="doc-card-arrow">Cursor setup →</span>
     </a>
+    <a href="/windsurf/" class="doc-card">
+      <span class="doc-card-tag">Editor setup</span>
+      <h3>Windsurf setup</h3>
+      <p>Install the shared Windsurf MCP config once, then run Switchman in your repo with the normal workspace flow.</p>
+      <span class="doc-card-arrow">Windsurf setup →</span>
+    </a>
     <a href="/file-locking/" class="doc-card">
       <span class="doc-card-tag">Core concepts</span>
       <h3>How file locking works</h3>
@@ -106,7 +112,7 @@
     <a href="/pro/" class="doc-card">
       <span class="doc-card-tag">Pro</span>
       <h3>Pro &amp; login guide</h3>
-      <p>Subscribe, activate with switchman login, invite teammates, and use AI planning.</p>
+      <p>Understand what free now includes, activate Pro, invite teammates, and use richer planning and shared coordination.</p>
       <span class="doc-card-arrow">Pro guide →</span>
     </a>
   </div>
@@ -124,7 +130,7 @@
       <span class="quick-link-arrow">↗</span>
     </a>
     <a href="https://switchman.dev/pro" class="quick-link">
-      Switchman Pro — unlimited agents from $25/month
+      Switchman Pro — deeper shared coordination from $19/month
       <span class="quick-link-arrow">↗</span>
     </a>
     <a href="https://github.com/switchman-dev/switchman/issues" class="quick-link">

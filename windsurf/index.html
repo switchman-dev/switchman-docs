@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windsurf Setup — Switchman Docs</title>
+  <meta name="description" content="Set up Switchman with Windsurf by installing the shared MCP config once, then using normal Switchman workspaces in your repo.">
+  <link rel="canonical" href="https://docs.switchman.dev/windsurf/">
+  <link rel="icon" type="image/svg+xml" href="/switchman-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../docs.css">
+</head>
+<body>
+<div class="docs-layout">
+
+  <nav class="top-nav">
+    <a href="https://switchman.dev" class="nav-logo">
+      <img src="/switchman-logo.svg" width="20" height="20" alt="Switchman">
+      switchman
+      <span class="nav-logo-badge">docs</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://switchman.dev">Home</a></li>
+      <li><a href="https://github.com/switchman-dev/switchman">GitHub</a></li>
+      <li><a href="https://discord.gg/pnT8BEC4D">Discord</a></li>
+      <li><a href="https://switchman.dev/pro" class="nav-install">Pro</a></li>
+    </ul>
+    <button class="mobile-nav-toggle" id="mob-toggle" aria-label="Open navigation menu">&#9776;</button>
+  </nav>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Start here</span>
+      <ul class="sidebar-nav">
+        <li><a href="/getting-started/">Getting started</a></li>
+        <li><a href="/claude-code/">Claude Code setup</a></li>
+        <li><a href="/cursor/">Cursor setup</a></li>
+        <li><a href="/windsurf/" class="active">Windsurf setup</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Core concepts</span>
+      <ul class="sidebar-nav">
+        <li><a href="/file-locking/">How file locking works</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Reference</span>
+      <ul class="sidebar-nav">
+        <li><a href="/command-reference/">Command reference</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Switchman Pro</span>
+      <ul class="sidebar-nav">
+        <li><a href="/pro/">Pro &amp; login guide <span class="badge">Pro</span></a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="doc-content">
+    <div class="breadcrumb">
+      <a href="/">Docs</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Windsurf setup</span>
+    </div>
+
+    <h1>Windsurf setup</h1>
+    <p class="doc-lead">Windsurf uses a shared MCP config instead of the project-local setup Cursor supports. Install that once, then use the normal Switchman workspace flow in your repo.</p>
+
+    <h2>1. Install Switchman into Windsurf once</h2>
+    <pre><code>switchman mcp install --windsurf</code></pre>
+
+    <p>This writes or updates:</p>
+    <pre><code>~/.codeium/mcp_config.json</code></pre>
+
+    <p>Existing MCP servers are preserved and the <code>switchman-mcp</code> entry is added or refreshed.</p>
+
+    <p>If you want to verify the generated config:</p>
+    <pre><code>switchman mcp install --windsurf --json</code></pre>
+
+    <h2>2. Prepare the repo</h2>
+    <p>The fastest path is the current guided flow:</p>
+    <pre><code>cd my-project
+switchman quickcheck
+switchman start "Implement auth helper"</code></pre>
+
+    <p>If you want the manual flow instead:</p>
+    <pre><code>switchman setup --agents 5
+switchman verify-setup</code></pre>
+
+    <h2>3. Open Windsurf</h2>
+    <p>In Windsurf, check:</p>
+    <ul>
+      <li><code>Settings</code></li>
+      <li><code>Cascade</code></li>
+      <li><code>MCP Servers</code></li>
+    </ul>
+
+    <p>Then open the repo or generated agent workspaces and let each agent use Switchman through MCP.</p>
+
+    <h2>4. Check the run</h2>
+    <pre><code>switchman status
+switchman status --watch
+switchman gate ci</code></pre>
+
+    <nav class="page-nav">
+      <a href="/cursor/" class="page-nav-card">
+        <div class="page-nav-label">← Previous</div>
+        <div class="page-nav-title">Cursor setup</div>
+      </a>
+      <a href="/file-locking/" class="page-nav-card next">
+        <div class="page-nav-label">Next →</div>
+        <div class="page-nav-title">How file locking works</div>
+      </a>
+    </nav>
+  </main>
+
+</div>
+<script src="../docs.js"></script>
+</body>
+</html>

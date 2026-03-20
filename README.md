@@ -9,6 +9,7 @@ Live at **[docs.switchman.dev](https://docs.switchman.dev)**
 - [Getting started](https://docs.switchman.dev/getting-started/) — install, demo, first setup
 - [Claude Code setup](https://docs.switchman.dev/claude-code/) — MCP config and CLAUDE.md
 - [Cursor setup](https://docs.switchman.dev/cursor/) — MCP config for Cursor
+- [Windsurf setup](https://docs.switchman.dev/windsurf/) — one-time MCP install for Windsurf
 - [How file locking works](https://docs.switchman.dev/file-locking/) — tasks, leases, and claims
 - [Command reference](https://docs.switchman.dev/command-reference/) — every CLI command
 - [Pro & login guide](https://docs.switchman.dev/pro/) — subscribe, activate, team invites
